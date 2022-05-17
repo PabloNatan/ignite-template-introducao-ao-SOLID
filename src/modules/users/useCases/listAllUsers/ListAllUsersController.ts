@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 import { Request, Response } from "express";
 
 import { ListAllUsersUseCase } from "./ListAllUsersUseCase";
@@ -6,7 +7,21 @@ class ListAllUsersController {
   constructor(private listAllUsersUseCase: ListAllUsersUseCase) {}
 
   handle(request: Request, response: Response): Response {
-    // Complete aqui
+    try {
+      const user_id = request.headers?.user_id;
+
+      if (!user_id) {
+        throw new Error("User id must be provided");
+      }
+
+      const all = this.listAllUsersUseCase.execute({
+        user_id: String(user_id),
+      });
+
+      return response.status(200).json(all);
+    } catch (e) {
+      return response.status(400).json({ error: e?.message });
+    }
   }
 }
 
